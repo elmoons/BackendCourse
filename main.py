@@ -52,9 +52,15 @@ def put_hotel(hotel_id: int, title: str = Body(), name: str = Body()):
     return {"status": "OK"}
 
 
-# @app.patch("/hotels/{hotel_id}")
-# def patch_hotel(hotel_id: int):
-#     pass
+@app.patch("/hotels/{hotel_id}")
+def patch_hotel(hotel_id: int, title: str | None = Body(default=None), name: str | None = Body(default=None)):
+    global hotels
+    hotel = [hotel for hotel in hotels if hotel["id"] == hotel_id]
+    if title and hotel[0]["id"] == hotel_id:
+        hotel[0]["title"] = title
+    if name and hotel[0]["id"] == hotel_id:
+        hotel[0]["name"] = name
+    return {"status": "OK"}
 
 
 if __name__ == "__main__":
