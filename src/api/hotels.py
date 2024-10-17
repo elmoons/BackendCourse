@@ -1,8 +1,9 @@
 from fastapi import Query, APIRouter, Body
 from src.api.dependencies import PaginationDep
 from src.database import async_session_maker, engine
+from src.repositories.hotels import HotelsRepository
 from src.schemas.hotels import Hotel, HotelPATCH
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, func
 from src.models. hotels import HotelsOrm
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
@@ -16,23 +17,12 @@ async def get_hotels(
 ):
     per_page = pagination.per_page or 5
     async with async_session_maker() as session:
-        query = select(HotelsOrm)
-        if location:
-            query = query.filter(HotelsOrm.location.like(f"%{location}%"))
-        if title:
-            query = query.filter(HotelsOrm.title.like(f"%{title}%"))
-        query = (
-            query
-            .limit(per_page)
-            .offset(per_page * (pagination.page - 1))
+        return await HotelsRepository(session).get_all(
+            title=title,
+            location=location,
+            limit=per_page,
+            offset=per_page * (pagination.page - 1)
         )
-        result = await session.execute(query)
-        hotels = result.scalars().all()
-        return hotels
-
-    # if pagination.page and pagination.per_page:
-    #     offset = pagination.per_page * (pagination.page-1)
-    #     return hotels_[offset:][:pagination.per_page]
 
 
 @router.post("", description="<h1>Добавление отеля<h1>")
