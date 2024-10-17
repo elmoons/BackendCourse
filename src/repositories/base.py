@@ -1,6 +1,6 @@
-from sqlalchemy import select
+from sqlalchemy import select, insert
 
-from src.database import async_session_maker
+from src.database import async_session_maker, engine
 
 
 class BaseRepository:
@@ -18,3 +18,10 @@ class BaseRepository:
         query = select(self.model)
         result = await self.session.execute(query)
         return result.scalars().one_or_none()
+
+    async def add(self, data: model):
+        add_hotel_stat = insert(self.model).values(**data.model_dump())
+        print(add_hotel_stat.compile(engine, compile_kwargs={"literal_binds": True}))
+        await self.session.execute(add_hotel_stat)
+        return data
+
