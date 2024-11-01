@@ -1,10 +1,6 @@
-from datetime import datetime, timezone, timedelta
+from fastapi import APIRouter, HTTPException, Response, Request
+from starlette.requests import cookie_parser
 
-from fastapi import APIRouter, HTTPException, Response
-from passlib.context import CryptContext
-import jwt
-
-from src.config import settings
 from src.database import async_session_maker
 from src.repositories.users import UsersRepository
 from src.schemas.users import UserRequestAdd, UserAdd
@@ -34,3 +30,16 @@ async def login_user(data: UserRequestAdd, response: Response):
         access_token = AuthService().create_access_token({"user_id": user.id})
         response.set_cookie("access_token", access_token)
         return {"access_token": access_token}
+
+
+@router.post("/only_auth")
+async def only_auth(
+        request: Request,
+):
+    try:
+        access_token = request.cookies["access_token"]
+        return {"access_token": access_token}
+    except KeyError:
+        access_token = None
+        return {"access_token": access_token}
+
