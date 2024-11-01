@@ -32,14 +32,14 @@ async def login_user(data: UserRequestAdd, response: Response):
         return {"access_token": access_token}
 
 
-@router.post("/only_auth")
+@router.get("/only_auth")
 async def only_auth(
         request: Request,
 ):
-    try:
-        access_token = request.cookies["access_token"]
-        return {"access_token": access_token}
-    except KeyError:
-        access_token = None
-        return {"access_token": access_token}
+    access_token = request.cookies.get("access_token")
+    data = AuthService().decode_jwt(access_token)
+    user_id = data["user_id"]
+    async with async_session_maker() as session:
+        user = await UsersRepository(session).get_one_or_none(id=user_id)
+    return user
 
