@@ -38,7 +38,7 @@ async def get_me(user_id: UserIdDep):
     return user
 
 
-@router.delete("/logout")
+@router.post("/logout")
 async def logout(response: Response):
     response.delete_cookie("access_token")
     return {"status": "OK"}
