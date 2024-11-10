@@ -24,8 +24,7 @@ async def add_room(db: DBDep, hotel_id: int, room_data: RoomAddRequest = Body())
 
 @router.get("/{hotel_id}/rooms/{room_id}", description="Получение конкретного номера отеля.")
 async def get_hotel_room(db: DBDep, hotel_id: int, room_id: int):
-    room = await db.room.get_one_or_none(hotel_id=hotel_id, id=room_id)
-    return {"status": "OK", "data": room}
+    return await db.rooms.get_one_or_none(hotel_id=hotel_id, id=room_id)
 
 
 @router.delete("/{hotel_id}/rooms/{room_id}")
