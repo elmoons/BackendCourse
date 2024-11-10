@@ -1,6 +1,13 @@
 from pydantic import BaseModel, Field
 
 
+class RoomAddRequest(BaseModel):
+    title: str
+    description: str
+    price: int
+    quantity: int
+
+
 class RoomAdd(BaseModel):
     hotel_id: int
     title: str
@@ -13,8 +20,16 @@ class Room(RoomAdd):
     id: int
 
 
-class RoomPATCH(BaseModel):
-    title: str | None = Field(default=None)
-    description: str | None = Field(default=None)
-    price: int | None = Field(default=None)
-    quantity: int | None = Field(default=None)
+class RoomPatchRequest(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    price: int | None = None
+    quantity: int | None = None
+
+
+class RoomPatch(BaseModel):
+    hotel_id: int | None = None
+    title: str | None = None
+    description: str | None = None
+    price: int | None = None
+    quantity: int | None = None

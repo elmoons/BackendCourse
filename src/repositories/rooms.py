@@ -8,10 +8,3 @@ from src.schemas.rooms import Room
 class RoomsRepository(BaseRepository):
     model = RoomsOrm
     schema = Room
-
-    async def get_all(self, **hotel_id):
-        query = select(RoomsOrm)
-        query = query.filter_by(**hotel_id)
-        result = await self.session.execute(query)
-        return [Room.model_validate(room, from_attributes=True) for room in result.scalars().all()]
-
