@@ -9,18 +9,15 @@ class BookingAddRequest(BaseModel):
     date_to: date
 
 
-class BookingAddNoPrice(BaseModel):
+class BookingAdd(BaseModel):
     user_id: int
     room_id: int
     date_from: date
     date_to: date
-
-
-class BookingAddWithPrice(BookingAddNoPrice):
     price: int
 
 
-class Booking(BookingAddWithPrice):
+class Booking(BookingAdd):
     id: int
 
 

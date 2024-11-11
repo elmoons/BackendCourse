@@ -1,19 +1,29 @@
 from fastapi import APIRouter
 
 from src.api.dependencies import DBDep, UserIdDep
-from src.schemas.bookings import BookingAddRequest, BookingAddNoPrice
+from src.schemas.bookings import BookingAddRequest, BookingAdd
 
 router = APIRouter(prefix="/bookings", tags=["Бронирование"])
 
 
 @router.post("")
-async def add_booking(db: DBDep, data: BookingAddRequest,  user_id: UserIdDep):
-    _data = BookingAddNoPrice(user_id=user_id, **data.model_dump())
-    await db.bookings.add(_data)
+async def add_booking(db: DBDep, booking_data: BookingAddRequest,  user_id: UserIdDep):
+    room = await db.rooms.get_one_or_none(id=booking_data.room_id)
+    current_price = room.price * (booking_data.date_to - booking_data.date_from).days
+    _data = BookingAdd(user_id=user_id, price=current_price, **booking_data.model_dump())
+    booking = await db.bookings.add(_data)
     await db.commit()
-    return {"status": "OK", "data": _data}
+    return {"status": "OK", "data": booking}
 
 
+@router.get("")
+async def get_all_bookings(db: DBDep):
+    bookings = await db.bookings.get_all()
+    return {"status": "OK", "data": bookings}
 
 
+@router.get("/me")
+async def get_my_bookings(db: DBDep, user_id: UserIdDep):
+    bookings = await db.bookings.get_all(user_id=user_id)
+    return {"status": "OK", "data": bookings}
 
