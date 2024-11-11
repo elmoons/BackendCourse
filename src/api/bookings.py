@@ -24,6 +24,6 @@ async def get_all_bookings(db: DBDep):
 
 @router.get("/me")
 async def get_my_bookings(db: DBDep, user_id: UserIdDep):
-    bookings = await db.bookings.get_all(user_id=user_id)
+    bookings = await db.bookings.get_filtered(user_id=user_id)
     return {"status": "OK", "data": bookings}
 
