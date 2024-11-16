@@ -1,4 +1,7 @@
+from datetime import date
+
 from fastapi import APIRouter, Body
+from fastapi.params import Query
 
 from src.api.dependencies import DBDep
 from src.database import async_session_maker
@@ -9,8 +12,11 @@ router = APIRouter(prefix="/hotels", tags=["Номера"])
 
 
 @router.get("/{hotel_id}/rooms", description="Получение номеров отеля.")
-async def get_hotel_rooms(db: DBDep, hotel_id: int):
-    rooms = await db.rooms.get_all(hotel_id=hotel_id)
+async def get_hotel_rooms(db: DBDep,
+                          hotel_id: int,
+                          date_from: date = Query(example="2024-11-01"),
+                          date_to: date = Query(example="2024-11-10")):
+    rooms = await db.rooms.get_filtered_by_time(hotel_id=hotel_id, date_from=date_from, date_to=date_to)
     return {"status": "OK", "data": rooms}
 
 
