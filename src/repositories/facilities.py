@@ -1,6 +1,6 @@
-from src.models.facilities import FacilitiesOrm
+from src.models.facilities import FacilitiesOrm, RoomsFacilitiesOrm
 from src.repositories.base import BaseRepository
-from src.schemas.facilities import Facilities
+from src.schemas.facilities import Facilities, RoomFacility
 
 
 class FacilitiesRepository(BaseRepository):
@@ -8,6 +8,7 @@ class FacilitiesRepository(BaseRepository):
     schema = Facilities
 
 
-
-
+class RoomsFacilitiesRepository(BaseRepository):
+    model = RoomsFacilitiesOrm
+    schema = RoomFacility
 
