@@ -6,7 +6,7 @@ from fastapi.params import Query
 from src.api.dependencies import DBDep
 from src.database import async_session_maker
 from src.repositories.rooms import RoomsRepository
-from src.schemas.facilities import RoomFacilityAdd
+from src.schemas.facilities import RoomFacilityAdd, RoomFacility
 from src.schemas.rooms import RoomAdd, RoomAddRequest, RoomPatchRequest, RoomPatch
 
 router = APIRouter(prefix="/hotels", tags=["Номера"])
@@ -47,6 +47,9 @@ async def delete_room(db: DBDep, hotel_id: int, room_id: int):
 async def put_hotel(db: DBDep, hotel_id: int, room_id: int, room_data: RoomAddRequest):
     _room_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump())
     await db.rooms.edit(_room_data, id=room_id)
+    await db.rooms_facilities.delete(room_id=room_id)
+    rooms_facilities_data = [RoomFacilityAdd(room_id=room_id, facility_id=f_id) for f_id in room_data.facilities_ids]
+    await db.rooms_facilities.add_bulk(rooms_facilities_data)
     await db.commit()
     return {"status": "OK"}
 
@@ -55,5 +58,9 @@ async def put_hotel(db: DBDep, hotel_id: int, room_id: int, room_data: RoomAddRe
 async def patch_hotel(db: DBDep, hotel_id: int, room_id: int, room_data: RoomPatchRequest):
     _room_data = RoomPatch(hotel_id=hotel_id, **room_data.model_dump(exclude_unset=True))
     await db.rooms.edit(_room_data, exclude_unset=True, hotel_id=hotel_id,  id=room_id)
+    if room_data.facilities_ids is not None:
+        await db.rooms_facilities.delete(room_id=room_id)
+        rooms_facilities_data = [RoomFacilityAdd(room_id=room_id, facility_id=f_id) for f_id in room_data.facilities_ids]
+        await db.rooms_facilities.add_bulk(rooms_facilities_data)
     await db.commit()
     return {"status": "OK"}
