@@ -28,4 +28,11 @@ class RoomsRepository(BaseRepository):
         result = await self.session.execute(query)
         return [RoomWithRels.model_validate(model, from_attributes=True) for model in result.unique().scalars().all()]
 
-
+    async def get_one_or_none_room_with_rels(self, **filter_by):
+        query = (
+            select(self.model)
+            .filter_by(**filter_by)
+            .options(joinedload(self.model.facilities))
+        )
+        result = await self.session.execute(query)
+        return [RoomWithRels.model_validate(model, from_attributes=True) for model in result.unique().scalars().all()]
