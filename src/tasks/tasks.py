@@ -14,7 +14,7 @@ def test_task():
     print("Я молодец!")
 
 
-@celery_instance.task
+# @celery_instance.task
 def resize_image(image_path: str):
     sizes = [200, 500, 1000]
 
@@ -44,7 +44,6 @@ def resize_image(image_path: str):
 async def get_booking_with_today_checkin_helper():
     print("Я ЗАПУСКАЮСЬ")
     async with DBManager(session_factory=async_session_maker_null_pool) as db:
-        print("!!!")
         bookings = await db.bookings.get_bookings_with_today_checkin()
         print(f"{bookings=}")
 
