@@ -36,7 +36,7 @@ async def run_send_email_regulary():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    asyncio.create_task(run_send_email_regulary())
+    # asyncio.create_task(run_send_email_regulary())
     await redis_manager.connect()
     FastAPICache.init(RedisBackend(redis_manager.redis), prefix="fastapi-cache")
     yield
