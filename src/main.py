@@ -56,4 +56,4 @@ app.include_router(router_bookings)
 app.include_router(router_images)
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", port=8000, reload=True)
+    uvicorn.run("main:app", port=7999, reload=True)
