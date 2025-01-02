@@ -7,7 +7,8 @@ from src.models.bookings import BookingsOrm
 from src.models.rooms import RoomsOrm
 from src.repositories.base import BaseRepository
 from src.repositories.mappers.mappers import BookingDataMapper
-from src.schemas.bookings import Booking
+from src.repositories.utils import rooms_ids_for_booking
+from src.schemas.bookings import Booking, BookingAdd
 
 
 class BookingsRepository(BaseRepository):
@@ -22,19 +23,17 @@ class BookingsRepository(BaseRepository):
         res = await self.session.execute(query)
         return [self.mapper.map_to_domain_entity(booking) for booking in res.scalars().all()]
 
-    async def add_booking(self, booking_data, free_rooms):
-        bookings_query = (
-            select(BookingsOrm)
-            .filter(BookingsOrm.room_id == booking_data.room_id)
+    async def add_booking(self, booking_data: BookingAdd, hotel_id: int):
+        rooms_ids_to_get = rooms_ids_for_booking(
+            date_from=booking_data.date_from,
+            date_to=booking_data.date_to,
+            hotel_id=hotel_id
         )
-        result = await self.session.execute(bookings_query)
-        bookings = result.scalars().all()
-        bookings_count = len(bookings)
+        rooms_ids_to_book_res = await self.session.execute(rooms_ids_to_get)
+        rooms_ids_to_book: list[int] = rooms_ids_to_book_res.scalars().all()
 
-        quantity_room = len(free_rooms)
-
-        if bookings_count < quantity_room:
-            booking = await BaseRepository.add(self, data=booking_data)
-            return self.mapper.map_to_domain_entity(booking)
+        if booking_data.room_id in rooms_ids_to_book:
+            new_booking = await self.add(booking_data)
+            return new_booking
         else:
-            return "На данные даты эти комнаты уже забронированы."
+            raise HTTPException(500)
