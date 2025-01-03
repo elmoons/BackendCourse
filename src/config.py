@@ -29,7 +29,9 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int
 
     # Указываем абсолютный путь к файлу .env
-    model_config = SettingsConfigDict(env_file=str(pathlib.Path(__file__).resolve().parent.parent / ".env"))
+    model_config = SettingsConfigDict(
+        env_file=str(pathlib.Path(__file__).resolve().parent.parent / ".env")
+    )
 
 
 settings = Settings()

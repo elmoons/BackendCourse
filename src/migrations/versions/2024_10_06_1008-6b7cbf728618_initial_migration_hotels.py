@@ -1,7 +1,7 @@
 """initial migration hotels
 
 Revision ID: 6b7cbf728618
-Revises: 
+Revises:
 Create Date: 2024-10-06 10:08:14.486246
 
 """

@@ -21,12 +21,16 @@ async def get_my_bookings(db: DBDep, user_id: UserIdDep):
 
 
 @router.post("")
-async def add_booking(db: DBDep, booking_data: BookingAddRequest,  user_id: UserIdDep):
+async def add_booking(db: DBDep, booking_data: BookingAddRequest, user_id: UserIdDep):
     room = await db.rooms.get_one_or_none(id=booking_data.room_id)
     hotel = await db.hotels.get_one_or_none(id=room.hotel_id)
     current_price = room.price * (booking_data.date_to - booking_data.date_from).days
-    _data = BookingAdd(user_id=user_id, price=current_price, created_at=datetime.utcnow(), **booking_data.model_dump())
+    _data = BookingAdd(
+        user_id=user_id,
+        price=current_price,
+        created_at=datetime.utcnow(),
+        **booking_data.model_dump(),
+    )
     booking = await db.bookings.add_booking(booking_data=_data, hotel_id=hotel.id)
     await db.commit()
     return {"status": "OK", "data": booking}
-

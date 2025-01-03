@@ -20,7 +20,3 @@ class BookingAdd(BaseModel):
 
 class Booking(BookingAdd):
     id: int
-
-
-
-

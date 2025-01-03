@@ -12,12 +12,12 @@ router = APIRouter(prefix="/hotels", tags=["Отели"])
 @router.get("", description="<h1>Получение отелей<h1>")
 @cache(expire=10)
 async def get_hotels(
-        pagination: PaginationDep,
-        db: DBDep,
-        title: str | None = Query(default=None, description="Название отеля"),
-        location: str | None = Query(default=None, description="Локация"),
-        date_from: date = Query(example="2024-11-01"),
-        date_to: date = Query(example="2024-11-10")
+    pagination: PaginationDep,
+    db: DBDep,
+    title: str | None = Query(default=None, description="Название отеля"),
+    location: str | None = Query(default=None, description="Локация"),
+    date_from: date = Query(example="2024-11-01"),
+    date_to: date = Query(example="2024-11-10"),
 ):
     per_page = pagination.per_page or 5
     # return await db.hotels.get_all(
@@ -32,7 +32,7 @@ async def get_hotels(
         title=title,
         location=location,
         limit=per_page,
-        offset=per_page * (pagination.page - 1)
+        offset=per_page * (pagination.page - 1),
     )
 
 
@@ -42,16 +42,26 @@ async def get_hotel(db: DBDep, hotel_id: int):
 
 
 @router.post("", description="<h1>Добавление отеля<h1>")
-async def create_hotel(db: DBDep, hotel_data: HotelAdd = Body(openapi_examples={
-    "1": {"summary": "Сочи", "value": {
-        "title": "Отель Сочи 5 звезд у моря",
-        "location": "ул. Моря, 2",
-    }},
-    "2": {"summary": "Дубай", "value": {
-        "title": "Дубай у фонтана",
-        "location": "ул. Шейха, 4",
-    }}
-})
+async def create_hotel(
+    db: DBDep,
+    hotel_data: HotelAdd = Body(
+        openapi_examples={
+            "1": {
+                "summary": "Сочи",
+                "value": {
+                    "title": "Отель Сочи 5 звезд у моря",
+                    "location": "ул. Моря, 2",
+                },
+            },
+            "2": {
+                "summary": "Дубай",
+                "value": {
+                    "title": "Дубай у фонтана",
+                    "location": "ул. Шейха, 4",
+                },
+            },
+        }
+    ),
 ):
     hotel = await db.hotels.add(hotel_data)
     await db.commit()
