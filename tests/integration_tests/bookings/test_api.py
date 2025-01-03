@@ -1,5 +1,7 @@
 import pytest
 
+from tests.conftest import get_db_null_pool
+
 
 @pytest.mark.parametrize("room_id, date_from, date_to, status_code", [
     (1, "2024-08-01", "2024-08-10", 200),
@@ -31,10 +33,11 @@ async def test_add_booking(
         assert "data" in res
 
 
-@pytest.fixture(scope="function")
-async def delete_all_bookings(db):
-    await db.bookings.delete()
-    await db.commit()
+@pytest.fixture(scope="module")
+async def delete_all_bookings():
+    async for _db in get_db_null_pool():
+        await _db.bookings.delete()
+        await _db.commit()
 
 
 @pytest.mark.parametrize("room_id, date_from, date_to, count_bookings", [
@@ -53,18 +56,11 @@ async def test_add_and_get_my_bookings(
             "date_to": date_to,
         })
     assert response_add.status_code == 200
-    res_add = response_add.json()
-    assert isinstance(res_add, dict)
-    assert res_add["status"] == "OK"
-    assert "data" in res_add
 
     response_get = await authenticated_ac.get("/bookings/me")
     assert response_get.status_code == 200
     res_get = response_get.json()
-    assert isinstance(res_get, dict)
-    # assert len(res_get["data"]) == count_bookings
-    assert res_get["status"] == "OK"
-    assert "data" in res_get
+    assert len(res_get["data"]) == count_bookings
 
 
 
