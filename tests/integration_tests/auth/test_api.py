@@ -33,3 +33,6 @@ async def test_authentication_and_authorization(
     assert response_logout.status_code == status_code
     assert not ac.cookies
 
+    response_get_me = await ac.get("/auth/me")
+    assert response_get_me.status_code == 401
+
