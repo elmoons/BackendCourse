@@ -1,15 +1,12 @@
 from datetime import date
 
-from pydantic import BaseModel
-from sqlalchemy import func, select, delete, update
+from sqlalchemy import func, select
 
-from src.database import engine
 from src.models.hotels import HotelsOrm
 from src.models.rooms import RoomsOrm
 from src.repositories.base import BaseRepository
 from src.repositories.mappers.mappers import HotelDataMapper
 from src.repositories.utils import rooms_ids_for_booking
-from src.schemas.hotels import Hotel
 
 
 class HotelsRepository(BaseRepository):

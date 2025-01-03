@@ -1,4 +1,4 @@
-import asyncio
+# ruff: noqa: E402
 import json
 from unittest import mock
 
@@ -10,8 +10,8 @@ from src.api.dependencies import get_db
 from src.config import settings
 from src.database import engine_null_pool, Base, async_session_maker_null_pool
 from src.main import app
-from src.models import *
-from httpx import AsyncClient, ASGITransport, Response
+from src.models import * # noqa
+from httpx import AsyncClient
 
 from src.schemas.hotels import HotelAdd
 from src.schemas.rooms import RoomAdd

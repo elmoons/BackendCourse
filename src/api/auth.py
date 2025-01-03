@@ -1,7 +1,5 @@
 from fastapi import APIRouter, HTTPException, Response
 from src.api.dependencies import UserIdDep, DBDep
-from src.database import async_session_maker
-from src.repositories.users import UsersRepository
 from src.schemas.users import UserRequestAdd, UserAdd
 from src.services.auth import AuthService
 
@@ -10,10 +8,13 @@ router = APIRouter(prefix="/auth", tags=["Авторизация и аутент
 
 @router.post("/register")
 async def register_user(db: DBDep, data: UserRequestAdd):
-    hashed_password = AuthService().hash_password(data.password)
-    new_user_data = UserAdd(email=data.email, hashed_password=hashed_password)
-    await db.users.add(new_user_data)
-    await db.commit()
+    try:
+        hashed_password = AuthService().hash_password(data.password)
+        new_user_data = UserAdd(email=data.email, hashed_password=hashed_password)
+        await db.users.add(new_user_data)
+        await db.commit()
+    except:  # noqa: E722
+        raise HTTPException(status_code=400)
     return {"status": "OK"}
 
 
@@ -39,4 +40,3 @@ async def get_me(db: DBDep, user_id: UserIdDep):
 async def logout(response: Response):
     response.delete_cookie("access_token")
     return {"status": "OK"}
-
