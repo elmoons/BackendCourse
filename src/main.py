@@ -27,7 +27,7 @@ async def send_emails_bookings_today_checkin():
         print(f"{bookings=}")
 
 
-async def run_send_email_regulary():
+async def run_send_email_regularly():
     while True:
         await send_emails_bookings_today_checkin()
         await asyncio.sleep(5)
@@ -55,4 +55,4 @@ app.include_router(router_bookings)
 app.include_router(router_images)
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", port=7999, reload=True)
+    uvicorn.run("main:app", port=7998, reload=True)
