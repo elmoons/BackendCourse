@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 from sqlalchemy import select, insert, delete, update
-from sqlalchemy.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound, IntegrityError, DBAPIError
 
-from src.exceptions import ObjectNotFoundException
+from src.exceptions import ObjectNotFoundException, UserWithThisEmailAlreadyRegistered, NoSuchRoomException
 from src.repositories.mappers.base import DataMapper
 
 
@@ -31,8 +31,8 @@ class BaseRepository:
 
     async def get_one(self, **filter_by) -> BaseModel:
         query = select(self.model).filter_by(**filter_by)
-        result = await self.session.execute(query)
         try:
+            result = await self.session.execute(query)
             model = result.scalar_one()
         except NoResultFound:
             raise ObjectNotFoundException
@@ -40,9 +40,12 @@ class BaseRepository:
 
     async def add(self, data: BaseModel):
         add_data_stmt = insert(self.model).values(**data.model_dump()).returning(self.model)
-        result = await self.session.execute(add_data_stmt)
-        model = result.scalars().one()
-        return self.mapper.map_to_domain_entity(model)
+        try:
+            result = await self.session.execute(add_data_stmt)
+            model = result.scalar_one()
+            return self.mapper.map_to_domain_entity(model)
+        except IntegrityError:
+            raise ObjectNotFoundException
 
     async def add_bulk(self, data: list[BaseModel]):
         add_data_stmt = (
@@ -56,8 +59,13 @@ class BaseRepository:
             .filter_by(**filter_by)
             .values(**data.model_dump(exclude_unset=exclude_unset))
         )
-        await self.session.execute(update_stmt)
+        result = await self.session.execute(update_stmt)
+        if result.rowcount == 0:
+            raise ObjectNotFoundException
 
     async def delete(self, **filter_by) -> None:
         delete_stmt = delete(self.model).filter_by(**filter_by)
-        await self.session.execute(delete_stmt)
+        result = await self.session.execute(delete_stmt)
+        if result.rowcount == 0:
+            raise ObjectNotFoundException
+

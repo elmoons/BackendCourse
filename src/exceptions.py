@@ -11,3 +11,15 @@ class ObjectNotFoundException(NabronirovalException):
 
 class AllRoomsAreBookedException(NabronirovalException):
     detail = "Не осталось свободных номеров"
+
+
+class UserWithThisEmailAlreadyRegistered(NabronirovalException):
+    detail = "Пользователь с таким email уже зарегистрирован"
+
+
+class NoSuchRoomException(NabronirovalException):
+    detail = "Номера не существует"
+
+
+class CheckInDateLaterOutDate(NabronirovalException):
+    detail = "Дата выезда не может быть раньше или равна дате заезда"
