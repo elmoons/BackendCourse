@@ -2,11 +2,14 @@ from fastapi_cache.decorator import cache
 
 from datetime import date
 
-from fastapi import Query, APIRouter, Body, HTTPException
-from sqlalchemy.exc import NoResultFound
+from fastapi import Query, APIRouter, Body
 
 from src.api.dependencies import PaginationDep, DBDep
-from src.exceptions import ObjectNotFoundException, CheckInDateLaterOutDate
+from src.exceptions import (
+    ObjectNotFoundException,
+    check_date_is_after_date_from,
+    HotelNotFoundHTTPException,
+)
 from src.schemas.hotels import HotelAdd, HotelPatch
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
@@ -22,24 +25,16 @@ async def get_hotels(
     date_from: date = Query(example="2024-11-01"),
     date_to: date = Query(example="2024-11-10"),
 ):
+    check_date_is_after_date_from(date_from=date_from, date_to=date_to)
     per_page = pagination.per_page or 5
-    # return await db.hotels.get_all(
-    #     title=title,
-    #     location=location,
-    #     limit=per_page,
-    #     offset=per_page * (pagination.page - 1)
-    # )
-    try:
-        return await db.hotels.get_filtered_by_time(
-            date_from=date_from,
-            date_to=date_to,
-            title=title,
-            location=location,
-            limit=per_page,
-            offset=per_page * (pagination.page - 1),
-        )
-    except CheckInDateLaterOutDate as e:
-        raise HTTPException(status_code=404, detail=e.detail)
+    return await db.hotels.get_filtered_by_time(
+        date_from=date_from,
+        date_to=date_to,
+        title=title,
+        location=location,
+        limit=per_page,
+        offset=per_page * (pagination.page - 1),
+    )
 
 
 @router.get("/{hotel_id}")
@@ -47,7 +42,7 @@ async def get_hotel(db: DBDep, hotel_id: int):
     try:
         return await db.hotels.get_one(id=hotel_id)
     except ObjectNotFoundException:
-        raise HTTPException(status_code=404, detail="Отель не найден")
+        raise HotelNotFoundHTTPException
 
 
 @router.post("", description="<h1>Добавление отеля<h1>")
