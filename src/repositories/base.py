@@ -1,3 +1,5 @@
+import logging
+
 from pydantic import BaseModel
 from asyncpg.exceptions import UniqueViolationError
 from sqlalchemy import select, insert, delete, update
@@ -49,9 +51,15 @@ class BaseRepository:
             model = result.scalar_one()
             return self.mapper.map_to_domain_entity(model)
         except IntegrityError as e:
+            logging.error(
+                f"Не удалось добавить данные в БД, входные данные={data}, тип ошибки: {type(e.orig.__cause__)}"
+            )
             if isinstance(e.orig.__cause__, UniqueViolationError):
                 raise ObjectAlreadyExistException from e
             else:
+                logging.error(
+                    f"Незнакомая ошибка, не удалось добавить данные в БД, входные данные={data}, тип ошибки: {type(e.orig.__cause__)}"
+                )
                 raise e
 
     async def add_bulk(self, data: list[BaseModel]):
