@@ -30,6 +30,18 @@ class ObjectAlreadyExistException(NabronirovalException):
     detail = "Похожий объект уже существует"
 
 
+class UserAlreadyExistException(ObjectAlreadyExistException):
+    detail = "Пользователь с таким email уже существует"
+
+
+class UserEmailNotExistException(NabronirovalException):
+    detail = "Пользователь с таким email не зарегистрирован"
+
+
+class UserPasswordIncorrectException(NabronirovalException):
+    detail = "Пароль неверный"
+
+
 class NoSuchRoomException(NabronirovalException):
     detail = "Номер не существует"
 
@@ -39,7 +51,7 @@ def check_date_is_after_date_from(date_from: date, date_to: date) -> None:
         raise HTTPException(status_code=422, detail="Дата заезда не может быть позже даты выезда")
 
 
-class NabronirovalException(HTTPException):
+class NabronirovalHTTPException(HTTPException):
     status_code = 500
     detail = None
 
@@ -47,11 +59,35 @@ class NabronirovalException(HTTPException):
         super().__init__(status_code=self.status_code, detail=self.detail)
 
 
-class HotelNotFoundHTTPException(NabronirovalException):
+class HotelNotFoundHTTPException(NabronirovalHTTPException):
     status_code = 404
     detail = "Отель не найден"
 
 
-class RoomNotFoundHTTPException(NabronirovalException):
+class RoomNotFoundHTTPException(NabronirovalHTTPException):
     status_code = 404
     detail = "Номер не найден"
+
+
+class IncorrectTokenException(NabronirovalHTTPException):
+    detail = "Некорректный токен"
+
+
+class UserEmailAlreadyExistHTTPException(NabronirovalHTTPException):
+    status_code = 409
+    detail = "Пользователь с таким email уже существует"
+
+
+class UserEmailNotExistHTTPException(NabronirovalHTTPException):
+    status_code = 401
+    detail = "Пользователь с таким email не существует"
+
+
+class UserPasswordIncorrectHTTPException(NabronirovalHTTPException):
+    status_code = 401
+    detail = "Пароль не верный"
+
+
+class AllRoomsAreBookedHTTPException(NabronirovalHTTPException):
+    status_code = 409
+    detail = "Не осталось свободных номеров"
