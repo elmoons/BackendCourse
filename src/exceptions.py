@@ -26,6 +26,10 @@ class AllRoomsAreBookedException(NabronirovalException):
     detail = "Не осталось свободных номеров"
 
 
+class IncorrectTokenException(NabronirovalException):
+    detail = "Некорректный токен"
+
+
 class ObjectAlreadyExistException(NabronirovalException):
     detail = "Похожий объект уже существует"
 
@@ -69,10 +73,6 @@ class RoomNotFoundHTTPException(NabronirovalHTTPException):
     detail = "Номер не найден"
 
 
-class IncorrectTokenException(NabronirovalHTTPException):
-    detail = "Некорректный токен"
-
-
 class UserEmailAlreadyExistHTTPException(NabronirovalHTTPException):
     status_code = 409
     detail = "Пользователь с таким email уже существует"
@@ -85,9 +85,18 @@ class UserEmailNotExistHTTPException(NabronirovalHTTPException):
 
 class UserPasswordIncorrectHTTPException(NabronirovalHTTPException):
     status_code = 401
-    detail = "Пароль не верный"
+    detail = "Пароль неверный"
 
 
 class AllRoomsAreBookedHTTPException(NabronirovalHTTPException):
     status_code = 409
     detail = "Не осталось свободных номеров"
+
+
+class IncorrectTokenHTTPException(NabronirovalHTTPException):
+    detail = "Некорректный токен"
+
+
+class NoAccessTokenHTTPException(NabronirovalHTTPException):
+    status_code = 401
+    detail = "Вы не предоставили токен доступа"
