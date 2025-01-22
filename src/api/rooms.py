@@ -5,14 +5,12 @@ from fastapi.params import Query
 
 from src.api.dependencies import DBDep
 from src.exceptions import (
-    ObjectNotFoundException,
     HotelNotFoundHTTPException,
     RoomNotFoundHTTPException,
     RoomNotFoundException,
     HotelNotFoundException,
 )
-from src.schemas.facilities import RoomFacilityAdd
-from src.schemas.rooms import RoomAdd, RoomAddRequest, RoomPatchRequest, RoomPatch
+from src.schemas.rooms import RoomAddRequest, RoomPatchRequest
 from src.services.rooms import RoomService
 
 router = APIRouter(prefix="/hotels", tags=["Номера"])
