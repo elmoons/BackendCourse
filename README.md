@@ -40,3 +40,4 @@ docker run --name booking_nginx \
     --volume /var/lib/letsencrypt:/var/lib/letsencrypt \
     --network=myNetwork \
     --rm -p 443:443 nginx
+ 
