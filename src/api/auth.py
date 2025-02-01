@@ -1,4 +1,7 @@
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, Response, FastAPI, Request
+from fastapi.exceptions import RequestValidationError
+from starlette.responses import PlainTextResponse, JSONResponse
+
 from src.api.dependencies import UserIdDep, DBDep
 from src.exceptions import UserAlreadyExistException, UserEmailAlreadyExistHTTPException, \
     UserEmailNotExistException, UserEmailNotExistHTTPException, UserPasswordIncorrectException, \
